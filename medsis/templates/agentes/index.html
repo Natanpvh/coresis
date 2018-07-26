@@ -10,11 +10,10 @@
                 <div>
                     <div class="card">
                         <div class="card-header">
-                            <a class="btn btn-primary btn-left criar-agente"
-                               href="{% url 'criar_agente' %}"
-                               role="button">
-                                <i class="fa fa-plus-square" aria-hidden="true"></i>
-                                Novo Agente</a></div>
+
+                            <a class="btn btn-success criar-agente" href="#"><i class="fa fa-plus"></i> Novo Agente</a>
+
+                        </div>
 
                     </div>
                 </div>
@@ -81,9 +80,10 @@
                                             <a href="#" title="Visualizar"
                                                class="btn btn-primary fa fa-eye verPost"
                                                data-url="{% url 'edit_agente' agente.id %}"></a>
-                                            <a href="{% url 'delete' agente.id %}" title="Deletar" class="btn btn-primary fa fa-trash delete"></a>
-                                            <a href="{% url 'edit_agente' agente.id %}" title="Editar"
-                                               class="btn btn-primary fa fa-edit"></a>
+                                            <a href="#" title="Deletar" data-url="{% url 'agente_delete' agente.id %}"
+                                               class="btn btn-primary fa fa-trash delete"></a>
+                                            <a href="#" data-url="{% url 'edit_agente' agente.id %}" title="Editar"
+                                               class="btn btn-primary fa fa-edit editar-agente"></a>
                                         </div>
                                     </td>
 
@@ -148,28 +148,41 @@
         <!-- /.col-lg-12 -->
     </div>
     <!-- ----------------------------------------------- -->
-
     <!-- Modal -->
-    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div id="modal-agente" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog modal-lg">
-
             <!-- Modal content-->
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
+
+     <div id="modal-agente-delete" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-sm">
+            <!-- Modal content-->
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="modal fade" id="myModalConfirm" role="dialog">
+        <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">Modal Header</h4>
                 </div>
                 <div class="modal-body">
-                    <div class="modal-content">
-                        {{ paciente }}
-                    </div>
+                    <p>This is a small modal.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <a href="#" class="btn primary">OK</a>
                 </div>
             </div>
-
         </div>
+    </div>
     </div>
 
 
@@ -177,21 +190,111 @@
 {% block scripts %}
     <script>
 
-        $(document).on('click', '.delete', function () {
-            $id = $(this).attr('name');
-            $.ajax({
-                url: '/delete/' + $id,
-                type: 'POST',
-                data: {
-                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
-                },
-                success: function () {
-                    Read();
-                    alert("Deleted!");
-                }
+        $(function () {
+            // Criar agente ---------------------------
+            $(".criar-agente").click(function () {
+                $.ajax({
+                    url: '/agentes/criar/',
+                    type: 'get',
+                    dataType: 'json',
+                    beforeSend: function () {
+                        $("#modal-agente").modal("show");
+                    },
+                    success: function (data) {
+                        $("#modal-agente .modal-content").html(data.html_form);
+                    }
+                });
+            });
+            $("#modal-agente").on("submit", ".js-book-create-agente", function () {
+                var form = $(this);
+                $.ajax({
+                    url: form.attr("action"),
+                    data: form.serialize(),
+                    type: form.attr("method"),
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.form_is_valid) {
+                            alert("Agente cadastrado com sucesso!");
+                            window.location = '{% url 'agentes' %}';
+                        }
+                        else {
+                            $("#modal-agente .modal-content").html(data.html_form);
+                        }
+                    }
+                });
+                return false;
+            });
+            // Editar Agente --------------------------
+            $(".editar-agente").click(function () {
+                var btn = $(this);
+                $.ajax({
+                    url: btn.attr("data-url"),
+                    type: 'get',
+                    dataType: 'json',
+                    beforeSend: function () {
+                        $("#modal-agente").modal("show");
+                    },
+                    success: function (data) {
+                        $("#modal-agente .modal-content").html(data.html_form);
+                    }
+                });
+            });
+            $("#modal-agente").on("submit", ".js-book-update-agente", function () {
+                var form = $(this);
+                $.ajax({
+                    url: form.attr("action"),
+                    data: form.serialize(),
+                    type: form.attr("method"),
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.form_is_valid) {
+                            alert("Agente Atualizado com susesso!");
+                            window.location = '{% url 'agentes' %}';
+                        }
+                        else {
+                            $("#modal-agente .modal-content").html(data.html_form);
+                        }
+                    }
+                });
+                return false;
+            });
+            // Deletar
+            $(".delete").click(function () {
+                var btn = $(this);
+                $.ajax({
+                    url: btn.attr("data-url"),
+                    type: 'get',
+                    dataType: 'json',
+                    beforeSend: function () {
+                        $("#modal-agente-delete").modal("show");
+                    },
+                    success: function (data) {
+
+                        $("#modal-agente-delete .modal-content").html(data.html_form);
+                    }
+                });
+
+            });
+            $("#modal-agente-delete").on("submit", ".delete-agente", function () {
+                var form = $(this);
+                $.ajax({
+                    url: form.attr("action"),
+                    data: form.serialize(),
+                    type: form.attr("method"),
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.form_is_valid) {
+                            alert("Agente Deletado com sucesso!");
+                            window.location = '{% url 'agentes' %}';
+                        }
+                        else {
+                            $("#modal-agente-delete .modal-content").html(data.html_form);
+                        }
+                    }
+                });
+                return false;
             });
         });
-
 
     </script>
 {% endblock scripts %}

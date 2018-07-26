@@ -1,53 +1,16 @@
-{% extends 'base.html' %}
-{% block title %}Pacientes{% endblock %}
-{% block body %}
-    <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header">Apagar</h1>
-        </div>
-
-        <!-- /.col-lg-12 -->
+<form method="post" action="{% url 'agente_delete'  agente.id %}" class="delete-agente">
+    {% csrf_token %}
+    <div class="modal-header alert alert-danger">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Deletar Agente</h4>
     </div>
-    <!-- /.row -->
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    Agente
-                </div>
-                <!-- /.panel-heading -->
-                <div class="panel-body">
-                    <form method="post" action="{% url 'delete'  object.id %}">
-                        {% csrf_token %}
-
-                        <div class="modal-body">
-                            <div class="row">
-                                 {{ object.nome }}
-
-
-                            </div>
-                            <div class="modal-footer">
-                                 <button type="submit" class="btn btn-danger small">DELETAR</button>
-                                <a href="{% url 'agentes' %}" class="btn btn-default">Sair</a>
-
-                            </div>
-                    </form>
-                </div>
-                <!-- /.panel-body -->
-            </div>
-            <!-- /.panel -->
+    <div class="modal-body">
+        <div class="alert">
+            Tem certeza de que deseja excluir o Agente? <strong>{{ agente.nome }}!</strong>
         </div>
-        <!-- /.col-lg-12 -->
     </div>
-    <!-- ----------------------------------------------- -->
-
-
-
-
-{% endblock body %}
-{% block scripts %}
-    <script>
-
-
-    </script>
-{% endblock scripts %}
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-danger small">DELETAR</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Sair</button>
+    </div>
+</form>

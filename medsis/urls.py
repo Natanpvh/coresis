@@ -17,9 +17,16 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    #login
+    path('accounts/login/', views.usu_login, name='login_uso'),
+    path('logout/', views.usu_logout, name='usu_logout'),
+    #AGENTES DE SAUDE
     path('', views.home, name='index'),
     path('agentes/', views.agente_list, name='agentes'),
     path('agentes/criar/', views.agente_criar, name='criar_agente'),
     path('agente/edit/<int:pk>/', views.agente_edit, name='edit_agente'),
-    path('delete/<int:pk>/', views.agente_delete, name='delete'),
+    path('agente/delet/<int:pk>/', views.agente_delete, name='agente_delete'),
+
+    #Cadastro de usuarios
+    path('cadastro/', views.cadastro_usuario, name='cadastro_usu')
 ]

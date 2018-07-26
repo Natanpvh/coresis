@@ -1,10 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% load widget_tweaks %}
+
+<form method="post" action="{% url 'edit_agente' form.instance.pk %}" class="js-book-update-agente">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="col-lg-6">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert {{ message.tags }} alert-dismissible text-center" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <strong>{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Error{% else %}
+                                {{ message.tags|title }}{% endif %}!</strong> {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Cadastrar Agente</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            {% include 'agentes/form-parte.html' %}
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-success small">Salvar</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Sair</button>
+    </div>
+    <!-- /.col-lg-12 -->
+</form>

@@ -11,7 +11,8 @@ class AgenteDeSaude(models.Model):
         verbose_name = "Agente"
         verbose_name_plural = "Agentes"
         permissions = (
-            ('view_agentedesaude', ' View Agente de Saúde'),
+            ('pode_add_agente', 'Pode Adicionar Agente'),
+            ('pode_delet_agente', 'Pode fazer outra coisa'),
         )
 
     def __str__(self):
