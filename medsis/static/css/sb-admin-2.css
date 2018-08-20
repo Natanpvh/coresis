@@ -438,3 +438,11 @@ table.dataTable thead .sorting:after {
   padding-left: 1px;
   padding-right: 1px;
 }
+
+.table-padrao{
+  width: 100%;
+}
+.table-padrao tr td{
+  padding: 3px 5px;
+  border-radius:5px;
+}

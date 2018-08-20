@@ -1,6 +1,6 @@
 {% load widget_tweaks %}
 
-<form method="post" action="{% url 'edit_agente' form.instance.pk %}" class="js-book-update-agente">
+<form method="post" action="{% url 'edit_agente' form.instance.pk %}" class="update-agente">
     {% csrf_token %}
     <div class="row">
         <div class="col-sm-12">
@@ -20,9 +20,9 @@
         <!-- /.col-lg-12 -->
     </div>
     <!-- /.row -->
-    <div class="modal-header">
+    <div class="modal-header alert alert-warning">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Cadastrar Agente</h4>
+        <h4 class="modal-title">Editar Agente</h4>
     </div>
     <div class="modal-body">
         <div class="row">
@@ -30,8 +30,13 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-success small">Salvar</button>
+
+        {% if request.GET.page %}
+            <input type="hidden" name="page" value="{{ request.GET.page }}">
+        {% endif %}
+        <button type="submit" class="btn btn-warning small">Salvar</button>
         <button type="button" class="btn btn-default" data-dismiss="modal">Sair</button>
     </div>
+
     <!-- /.col-lg-12 -->
 </form>

@@ -10,9 +10,12 @@ class AgenteDeSaude(models.Model):
         ordering = ['nome']
         verbose_name = "Agente"
         verbose_name_plural = "Agentes"
-        permissions = (
-            ('pode_add_agente', 'Pode Adicionar Agente'),
-            ('pode_delet_agente', 'Pode fazer outra coisa'),
+        permissions =(
+            ('lista_agente', 'Lista Agentes'),
+            ('adicionar_agente', 'Pode Adicionar Agente'),
+            ('editar_agente', 'Pode editar Agente'),
+            ('deletar_agente', 'Pode deletar Agente'),
+            ('ver_agente', 'Pode visualizar Agente'),
         )
 
     def __str__(self):

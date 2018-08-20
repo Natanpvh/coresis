@@ -14,11 +14,8 @@
 
     <!-- Bootstrap Core CSS -->
     <link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet">
-
-
     <!-- Custom CSS -->
     <link href="{% static "css/sb-admin-2.css" %}" rel="stylesheet">
-
     <!-- Custom Fonts -->
     <link href="{% static "css/font-awesome.min.css" %}" rel="stylesheet" type="text/css">
 
@@ -32,7 +29,6 @@
 </head>
 
 <body>
-
 <div class="container">
     <div class="row">
         {% block body %}
@@ -40,18 +36,10 @@
         {% endblock body %}
     </div>
 </div>
-
 <!-- jQuery -->
-<script src="../vendor/jquery/jquery.min.js"></script>
-
+<script src="{% static "js/jquery.min.js" %}"></script>
 <!-- Bootstrap Core JavaScript -->
-<script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
-
-<!-- Metis Menu Plugin JavaScript -->
-<script src="../vendor/metisMenu/metisMenu.min.js"></script>
-
-<!-- Custom Theme JavaScript -->
-<script src="../dist/js/sb-admin-2.js"></script>
+<script src="{% static "js/bootstrap.min.js" %}"></script>
 
 </body>
 

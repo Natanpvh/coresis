@@ -10,31 +10,19 @@
                 <div>
                     <div class="card">
                         <div class="card-header">
-
-                            <a class="btn btn-success criar-agente" href="#"><i class="fa fa-plus"></i> Novo Agente</a>
-
+                            {% if 'medsis.adicionar_agente' in perms %}
+                                <a class="btn btn-success criar-agente" href="#"><i class="fa fa-plus"></i> Novo Agente</a>
+                            {% endif %}
                         </div>
-
                     </div>
                 </div>
             </div>
             <div class="col-lg-6">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert {{ message.tags }} fade in alert-dismissible  text-center" role="alert">
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                                    aria-hidden="true">&times;</span></button>
-                            <strong>{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Error{% else %}
-                                {{ message.tags|title }}{% endif %}!</strong> {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
             </div>
             <div class="col-lg-3">
                 <form method="get">
                     <div class="input-group custom-search-form">
-                        <input class="form-control" placeholder="Buscar Paciente" type="text" name="q"
+                        <input class="form-control" placeholder="Buscar Agente" type="text" name="q"
                                value="{{ request.GET.q }}">
                         <span class="input-group-btn">
                                 <button class="btn btn-default" type="submit">
@@ -52,7 +40,7 @@
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Lista de Pacientes
+                    Lista de Agentes
                 </div>
                 <!-- /.panel-heading -->
                 <div class="panel-body">
@@ -65,11 +53,9 @@
                                 <th>NOME</th>
                                 <th>RG</th>
                                 <th class="col-lg-2">OPÇÕES</th>
-
                             </tr>
                             </thead>
                             <tbody>
-
                             {% for agente in agentes %}
                                 <tr>
                                     <th>{{ agente.id }}</th>
@@ -77,16 +63,25 @@
                                     <td>{{ agente.rg }}</td>
                                     <td>
                                         <div class="pull-right btn-group ">
-                                            <a href="#" title="Visualizar"
-                                               class="btn btn-primary fa fa-eye verPost"
-                                               data-url="{% url 'edit_agente' agente.id %}"></a>
-                                            <a href="#" title="Deletar" data-url="{% url 'agente_delete' agente.id %}"
-                                               class="btn btn-primary fa fa-trash delete"></a>
-                                            <a href="#" data-url="{% url 'edit_agente' agente.id %}" title="Editar"
+                                            {% if 'medsis.ver_agente' in perms %}
+                                                <a href="#" data-toggle="tooltip" title="Visualizar"
+                                                   class="btn btn-primary fa fa-eye verPost ver_agente"
+                                                   data-url="{% url 'ver_agente' agente.id %}"></a>
+                                            {% endif %}
+                                            {% if 'medsis.deletar_agente' in perms %}
+                                                <a href="#" data-toggle="tooltip" title="Deletar"
+                                                   data-url="{% url 'agente_delete' agente.id %}"
+                                                   class="btn btn-primary fa fa-trash delete"></a>
+                                            {% endif %}
+                                            <a href="#" data-toggle="tooltip" title="Editar"
+                                               data-url="{% url 'edit_agente' agente.id %}"
                                                class="btn btn-primary fa fa-edit editar-agente"></a>
+                                            {% if user.is_superuser %}
+
+                                            {% endif %}
+
                                         </div>
                                     </td>
-
                                     {% empty %}
                                     <th colspan="6">Agentes Não Encontrado!</th>
                                 </tr>
@@ -98,21 +93,21 @@
                             <div class="col-sm-10">
                                 <div class="dataTables_paginate paging_simple_numbers">
                                     {{ numerorequisicao }}
-                                    {% if requisicoes.has_other_pages %}
+                                    {% if agentes.has_other_pages %}
                                         <nav aria-label="Page navigation example">
                                             <ul class="pagination">
-                                                {% if requisicoes.has_previous %}
+                                                {% if agentes.has_previous %}
                                                     <li class="page-item ">
                                                         <a class="page-link"
-                                                           href="?page={{ requisicoes.previous_page_number }}&q={{ request.GET.q }}">Anterior</a>
+                                                           href="?page={{ agentes.previous_page_number }}&q={{ request.GET.q }}">Anterior</a>
                                                     </li>
                                                 {% else %}
                                                     <li class="page-item disabled">
                                                         <a class="page-link" href="#" tabindex="-1">Anterior</a>
                                                     </li>
                                                 {% endif %}
-                                                {% for i in requisicoes.paginator.page_range %}
-                                                    {% if requisicoes.number == i %}
+                                                {% for i in agentes.paginator.page_range %}
+                                                    {% if agentes.number == i %}
                                                         <li class="page-item active">
                                                             <a class="page-link" href="#"><span>{{ i }} <span
                                                                     class="sr-only">(current)</span></span></a>
@@ -123,11 +118,11 @@
                                                         </li>
                                                     {% endif %}
                                                 {% endfor %}
-                                                {% if requisicoes.has_next %}
+                                                {% if agentes.has_next %}
                                                     <li class="page-item"><a class="page-link"
-                                                                             href="?page={{ requisicoes.next_page_number }}&q={{ request.GET.q }}">Próximo</a>
+                                                                             href="?page={{ agentes.next_page_number }}&q={{ request.GET.q }}">Próximo</a>
                                                     </li>
-                                                {% else %}jifdçl[
+                                                {% else %}
 
                                                     <li class="page-item disabled">
                                                         <a class="page-link" href="#" tabindex="-1">Next</a>
@@ -147,17 +142,26 @@
         </div>
         <!-- /.col-lg-12 -->
     </div>
-    <!-- ----------------------------------------------- -->
+
     <!-- Modal -->
-    <div id="modal-agente" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div id="modal-agente" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         data-backdrop="static">
         <div class="modal-dialog modal-lg">
             <!-- Modal content-->
             <div class="modal-content">
             </div>
         </div>
     </div>
-
-     <div id="modal-agente-delete" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div id="modal-agente-ver" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         data-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
+    <!-- Modal Delete -->
+    <div id="modal-agente-delete" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog modal-sm">
             <!-- Modal content-->
             <div class="modal-content">
@@ -165,32 +169,22 @@
         </div>
     </div>
 
-
-
-    <div class="modal fade" id="myModalConfirm" role="dialog">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Modal Header</h4>
-                </div>
-                <div class="modal-body">
-                    <p>This is a small modal.</p>
-                </div>
-                <div class="modal-footer">
-                    <a href="#" class="btn primary">OK</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    </div>
-
-
 {% endblock body %}
 {% block scripts %}
     <script>
-
         $(function () {
+
+            var htmlToPrint = '' +
+                '<div class="panel panel-default">' +
+                '<div class="panel-body">' +
+                '<div class="progress">' +
+                '<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">' +
+                'Carregando....' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+
             // Criar agente ---------------------------
             $(".criar-agente").click(function () {
                 $.ajax({
@@ -205,7 +199,8 @@
                     }
                 });
             });
-            $("#modal-agente").on("submit", ".js-book-create-agente", function () {
+
+            $("#modal-agente").on("submit", ".create-agente", function () {
                 var form = $(this);
                 $.ajax({
                     url: form.attr("action"),
@@ -224,22 +219,36 @@
                 });
                 return false;
             });
+
             // Editar Agente --------------------------
             $(".editar-agente").click(function () {
                 var btn = $(this);
+                var htmlToPrint = '' +
+                    '<div class="panel panel-default">' +
+                    '<div class="panel-body">' +
+                    '<div class="progress">' +
+                    '<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">' +
+                    'Carregando....' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+
                 $.ajax({
                     url: btn.attr("data-url"),
                     type: 'get',
                     dataType: 'json',
                     beforeSend: function () {
                         $("#modal-agente").modal("show");
+                        $("#modal-agente .modal-content").html(htmlToPrint);
                     },
                     success: function (data) {
                         $("#modal-agente .modal-content").html(data.html_form);
                     }
                 });
             });
-            $("#modal-agente").on("submit", ".js-book-update-agente", function () {
+
+            $("#modal-agente").on("submit", ".update-agente", function () {
                 var form = $(this);
                 $.ajax({
                     url: form.attr("action"),
@@ -258,6 +267,7 @@
                 });
                 return false;
             });
+
             // Deletar
             $(".delete").click(function () {
                 var btn = $(this);
@@ -266,6 +276,7 @@
                     type: 'get',
                     dataType: 'json',
                     beforeSend: function () {
+
                         $("#modal-agente-delete").modal("show");
                     },
                     success: function (data) {
@@ -275,6 +286,7 @@
                 });
 
             });
+
             $("#modal-agente-delete").on("submit", ".delete-agente", function () {
                 var form = $(this);
                 $.ajax({
@@ -294,7 +306,42 @@
                 });
                 return false;
             });
+
+            // VER AGENTE
+            $(".ver_agente").click(function () {
+                var btn = $(this);
+                var htmlToPrint = '' +
+                    '<div class="panel panel-default">' +
+                    '<div class="panel-body">' +
+                    '<div class="progress">' +
+                    '<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">' +
+                    'Carregando....' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+
+                $.ajax({
+                    url: btn.attr("data-url"),
+                    type: 'get',
+                    dataType: 'json',
+                    beforeSend: function () {
+                        $("#modal-agente-ver").modal("show");
+                        $("#modal-agente-ver .modal-content").html(htmlToPrint);
+
+                    },
+                    success: function (data) {
+                        $("#modal-agente-ver .modal-content").html(data.html_agente)
+
+                    }
+                });
+
+            });
         });
 
+        // Tooltip
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
     </script>
 {% endblock scripts %}

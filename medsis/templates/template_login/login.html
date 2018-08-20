@@ -17,10 +17,21 @@
                             <input class="form-control" placeholder="Senha" name="password" type="password" value="">
                         </div>
                         <div class="checkbox">
-                            <label>
-                                <input name="remember" type="checkbox" value="Remember Me">Remember Me
-                            </label>
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert {{ message.tags }} alert-dismissible text-center" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="Close"><span
+                                                aria-hidden="true">&times;</span></button>
+                                        <strong>{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Error{% else %}
+                                            {{ message.tags|title }}{% endif %}!</strong> {{ message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
                         </div>
+                        {% if request.GET.next %}
+                            <input type="hidden" name="next" value="{{ request.GET.next }}">
+                        {% endif %}
                         <!-- Change this to a button or input when using this as a form -->
                         <button type="submit" class="btn btn-lg btn-success btn-block">Login</button>
                     </fieldset>
@@ -28,6 +39,7 @@
             </div>
         </div>
     </div>
+
 
 {% endblock body %}
 {% block scripts %}

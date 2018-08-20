@@ -1,11 +1,11 @@
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required, permission_required
-from django.core.serializers import serialize
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.db.models import Q
+from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate
 
-# Create your views here.
 from django.template.loader import render_to_string
 from django.urls import reverse
 
@@ -14,44 +14,66 @@ from medsis.models import AgenteDeSaude
 
 
 def home(request):
-    list_agentes = serialize("json", AgenteDeSaude.objects.all())
-    return HttpResponse(list_agentes, content_type="application/json")
+    template = 'core/index.html'
+    return render(request, template)
 
 
+@login_required
+@permission_required('medsis.lista_agente')
 def agente_list(request):
-    """"  
-    list_agentes = serialize("json", AgenteDeSaude.objects.all())
-    return HttpResponse(list_agentes, content_type="application/json")
-    """
+    """ Lista os agentes de saude cadastrados """
     template = 'agentes/index.html'
-    list_agentes = AgenteDeSaude.objects.all()
 
-    context = {
-        'agentes': list_agentes,
-    }
+    if 'q' in request.GET != False:
 
-    return render(request, template, context)
+        lista_agentes = AgenteDeSaude.objects.all()
 
+        busca = request.GET.get("q")
 
-"""
-def agente_criar(request):
-    template = 'agentes/agente_form.html'
-    if request.method == 'POST':
-        form = AgenteDeSaudeForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Agente cadastrado com Sucesso!')
-            return HttpResponseRedirect(reverse('agentes'))
-        else:
-            print(form.errors)
+        query_list_busca = lista_agentes.filter(
+            Q(rg=busca)|
+            Q(nome__icontains=busca)
+        )
+
+        paginator = Paginator(query_list_busca, 3)
+        page = request.GET.get('page', 1)
+        try:
+            agentes = paginator.page(page)
+        except PageNotAnInteger:
+            agentes = paginator.page(1)
+        except EmptyPage:
+            agentes = paginator.page(paginator.num_pages)
+
+        context = {
+            'paginator': paginator,
+            'agentes': agentes,
+        }
+
+        return render(request, template, context)
     else:
-        form = AgenteDeSaudeForm()
 
-    return render(request, template, {'form': form})
-"""
+        list_agentes = AgenteDeSaude.objects.all()
+        paginator = Paginator(list_agentes, 3)
+        page = request.GET.get('page', 1)
+        try:
+            agentes = paginator.page(page)
+        except PageNotAnInteger:
+            agentes = paginator.page(1)
+        except EmptyPage:
+            agentes = paginator.page(paginator.num_pages)
+
+        context = {
+            'paginator': paginator,
+            'agentes': agentes,
+        }
+
+        return render(request, template, context)
 
 
+@login_required
+@permission_required('medsis.adicionar_agente', login_url='/accoubts/login/')
 def agente_criar(request):
+    """ Cadastra Agentes de Saúde """
     data = dict()
     if request.method == 'POST':
         form = AgenteDeSaudeForm(request.POST)
@@ -72,7 +94,10 @@ def agente_criar(request):
     return JsonResponse(data)
 
 
+@login_required
+@permission_required('medsis.editar_agente', login_url='/accounts/login/')
 def agente_edit(request, pk):
+    """ Edita Agente de Saúde """
     data = dict()
     agente = get_object_or_404(AgenteDeSaude, pk=pk)
 
@@ -95,7 +120,10 @@ def agente_edit(request, pk):
     return JsonResponse(data)
 
 
+@login_required
+@permission_required('medsis.deletar_agente', login_url='/accounts/login/')
 def agente_delete(request, pk):
+    """ Deleta Agente de Saúde """
     agente_d = get_object_or_404(AgenteDeSaude, pk=pk)
     data = dict()
     if request.method == "POST":
@@ -107,6 +135,16 @@ def agente_delete(request, pk):
                                              context,
                                              request=request
                                              )
+    return JsonResponse(data)
+
+
+def agente_visualisar(request, pk):
+    """ Visualisa o Cadastro"""
+    ver_agente = get_object_or_404(AgenteDeSaude, pk=pk)
+    data = dict()
+    if request.method == "GET":
+        context = {"agente": ver_agente}
+        data['html_agente'] = render_to_string('agentes/ver_agente.html', context, request=request)
     return JsonResponse(data)
 
 
@@ -124,20 +162,19 @@ def cadastro_usuario(request):
 def usu_login(request):
     template = 'template_login/login.html'
     if request.user.is_authenticated == True:
-        return redirect('index')
+        return redirect(reverse('index'))
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(username=username, password=password)
-
         if user is not None:
             # correct username and password login the user
             auth.login(request, user)
-            return redirect('index')
-
+            if 'next' in request.POST:
+                return redirect(request.POST.get('next'))
+            return redirect(reverse('index'))
         else:
-            messages.error(request, 'Error wrong username/password')
-
+            messages.error(request, 'Nome de usuário ou senha')
     return render(request, template)
 
 
